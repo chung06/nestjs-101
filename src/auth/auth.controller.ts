@@ -2,7 +2,7 @@ import {
   Body,
   Controller,
   Post,
-  Request,
+  Req,
   BadRequestException,
   UseGuards,
   Get,
@@ -12,6 +12,8 @@ import { LocalAuthGuard } from './guard/local-auth.guard';
 import { AuthService } from './auth.service';
 import { UserRegisterDto } from './dto/user-register.dto';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
+import { JwtRefreshAuthGuard } from './guard/jwt-refresh-auth.guard';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -32,13 +34,20 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  login(@Request() req) {
+  login(@Req() req) {
     return this.authService.login(req.user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
-  profile(@Request() req) {
+  profile(@Req() req) {
     return req.user;
+  }
+
+  @UseGuards(JwtRefreshAuthGuard)
+  @Post('/refresh')
+  refreshToken(@Req() req: Request) {
+    const token = req.headers.authorization.split(' ')[1];
+    return this.authService.createAccessTokenFromRefreshToken(token);
   }
 }

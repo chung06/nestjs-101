@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         privateKey: configService.get<string>('JWT_PRIVATE_KEY'),
+        publicKey: configService.get<string>('JWT_PUBLIC_KEY'),
         signOptions: { expiresIn: '30m', algorithm: 'RS256' },
       }),
       inject: [ConfigService],
