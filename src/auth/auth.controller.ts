@@ -6,6 +6,8 @@ import {
   BadRequestException,
   UseGuards,
   Get,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { LocalAuthGuard } from './guard/local-auth.guard';
@@ -14,6 +16,8 @@ import { UserRegisterDto } from './dto/user-register.dto';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { JwtRefreshAuthGuard } from './guard/jwt-refresh-auth.guard';
 import { Request } from 'express';
+import { plainToClass } from 'class-transformer';
+import { UserSerializer } from 'src/users/serializer/user.serializer';
 
 @Controller('auth')
 export class AuthController {
@@ -23,13 +27,9 @@ export class AuthController {
   ) {}
 
   @Post('/register')
+  @HttpCode(HttpStatus.OK)
   async register(@Body() userRegisterDto: UserRegisterDto): Promise<any> {
-    const user = await this.userService.findOne({
-      username: userRegisterDto.email,
-    });
-    if (user) {
-      throw new BadRequestException('username is already taken');
-    }
+    return await this.userService.create(userRegisterDto);
   }
 
   @UseGuards(LocalAuthGuard)
@@ -41,7 +41,9 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
   profile(@Req() req) {
-    return req.user;
+    return plainToClass(UserSerializer, req.user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @UseGuards(JwtRefreshAuthGuard)

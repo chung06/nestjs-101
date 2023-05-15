@@ -11,5 +11,8 @@ export class UserSerializer {
   email: string;
 
   @Expose()
+  phone: string;
+
+  @Expose()
   name: string;
 }

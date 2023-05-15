@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+
+  mysql-dev:
+    image: mysql:8.0.2
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_USER: nest
+      MYSQL_PASSWORD: nest
+      MYSQL_DATABASE: nest
+    ports:
+      - "3308:3306"
+    volumes:
+      - "./data/mysql:/var/lib/mysql:rw"
+
+  pgdb:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: nest
+      POSTGRES_PASSWORD: nest
+      POSTGRES_DB: nest
+    ports:
+      - "5433:5432"   
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
