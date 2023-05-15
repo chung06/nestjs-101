@@ -7,13 +7,14 @@ import {
   MaxLength,
   MinLength,
   IsPhoneNumber,
+  IsOptional,
 } from 'class-validator';
 
 /**
  * register user data transform object
  */
 export class UserRegisterDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsPhoneNumber()
   phone: string;
 

@@ -24,7 +24,9 @@ export class UserEntity extends CustomBaseEntity {
   @Index({
     unique: true,
   })
-  @Column()
+  @Column({
+    nullable: true,
+  })
   phone: string;
 
   @Column()
