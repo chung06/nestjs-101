@@ -3,11 +3,12 @@ import {
   Controller,
   Post,
   Req,
-  BadRequestException,
   UseGuards,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Put,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { LocalAuthGuard } from './guard/local-auth.guard';
@@ -51,5 +52,11 @@ export class AuthController {
   refreshToken(@Req() req: Request) {
     const token = req.headers.authorization.split(' ')[1];
     return this.authService.createAccessTokenFromRefreshToken(token);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/revoke/:id')
+  revokeRefreshToken(@Req() req, @Param('id') id: string) {
+    this.authService.revokeRefreshToken(id, req.user);
   }
 }

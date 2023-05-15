@@ -1,3 +1,4 @@
 export const TokenExceptions = {
-  InvalidRefreshTokon: 'InvalidRefreshToken',
+  InvalidRefreshToken: 'InvalidRefreshToken',
+  TokenNotFound: 'TokenNotFound',
 } as const;

@@ -25,6 +25,10 @@ export class JwtRefreshStrategy extends PassportStrategy(
     if (payload.type !== 'refresh') {
       return null;
     }
+
+    if (await this.authService.isRefreshTokenRevoked(payload.jti)) {
+      return null;
+    }
     return { id: payload.sub, username: payload.username };
   }
 }
