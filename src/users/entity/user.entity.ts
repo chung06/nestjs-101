@@ -18,7 +18,9 @@ export class UserEntity extends CustomBaseEntity {
   @Index({
     unique: true,
   })
-  @Column()
+  @Column({
+    nullable: true,
+  })
   email: string;
 
   @Index({
@@ -41,7 +43,9 @@ export class UserEntity extends CustomBaseEntity {
 
   @BeforeInsert()
   setUsername() {
-    this.username = this.email;
+    if (this.email) {
+      this.username = this.email;
+    }
   }
 
   @BeforeInsert()

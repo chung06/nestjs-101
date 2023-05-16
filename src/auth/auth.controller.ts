@@ -9,6 +9,7 @@ import {
   HttpStatus,
   Param,
   Put,
+  HttpException,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { LocalAuthGuard } from './guard/local-auth.guard';
@@ -20,6 +21,8 @@ import { Request } from 'express';
 import { plainToClass } from 'class-transformer';
 import { UserSerializer } from 'src/users/serializer/user.serializer';
 import { GoogleAuthGuard } from './guard/google.guard';
+import { LineAuthGuard } from './guard/line.guard';
+import { UserExceptions } from 'src/contants';
 
 @Controller('auth')
 export class AuthController {
@@ -71,6 +74,26 @@ export class AuthController {
   @Get('/google/callback')
   googleCallback(@Req() req) {
     const user = req.user;
+    return this.authService.login(user);
+  }
+
+  @UseGuards(LineAuthGuard)
+  @Get('/line/login')
+  lineLogin() {
+    return {};
+  }
+
+  @UseGuards(LineAuthGuard)
+  @Get('/line/callback')
+  async lineCallback(@Req() req) {
+    const user: UserSerializer = req.user;
+    const tokens = await this.authService.login(user);
+    if (!user.email && !user.phone) {
+      throw new HttpException(
+        { code: UserExceptions.UpdateEmailException, tokens: tokens },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     return this.authService.login(user);
   }
 }

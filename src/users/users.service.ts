@@ -20,7 +20,12 @@ export class UsersService {
   ): Promise<UserSerializer | UserEntity> {
     const user = await this.userRepository.findOne({
       where: [
-        { username: createUserDto.email },
+        {
+          username:
+            createUserDto.username ??
+            createUserDto.email ??
+            createUserDto.phone,
+        },
         { phone: createUserDto.phone },
       ],
     });
@@ -88,5 +93,35 @@ export class UsersService {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+  }
+
+  async findOrCreate(
+    createUserDto: DeepPartial<UserEntity>,
+  ): Promise<UserSerializer> {
+    const user = await this.userRepository.findOne({
+      where: [
+        {
+          username:
+            createUserDto.username ??
+            createUserDto.email ??
+            createUserDto.phone,
+        },
+        { phone: createUserDto.phone },
+      ],
+    });
+    if (user) {
+      return user;
+    } else {
+      if (!createUserDto.password) {
+        const password = this.generateRandomPassword();
+        createUserDto.password = password;
+      }
+      createUserDto.salt = await bcrypt.genSalt();
+      const dbUser = this.userRepository.create(createUserDto);
+      await dbUser.save();
+      return plainToClass(UserSerializer, dbUser, {
+        excludeExtraneousValues: true,
+      });
+    }
   }
 }
