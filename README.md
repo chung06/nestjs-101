@@ -1,73 +1,69 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# NestJS getting started project
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Project Overview
+### Brief
+- Authentication: JWT (sign and verify with RS256 algorithm), OAuth (login with Google, Line) supported by PassportJS
+- Database: TypeORM
+- Data validation & transformation : `class-validator`, `class-transformer`
+- Configuration: Nest built-in config service (`.env` file insides the project)
 
-## Description
+### Structure
+Project contains 3 modules: `auth`, `users`, `core`
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+**auth** module functions: 
+- register: register new user with email (email verify not implemented yet)
+- login: validate username + password and return access token + refresh token, username could be email or phone number
+- refresh token: create new access token by refresh token, refresh token must valid and not revoked
+- revoke refresh token: revoke token by token id, token id can extract by decoded refresh token payload, user must provide valid access token to performs this function
+- social login: support login with Google and Line
 
-## Installation
+**users** module functions:
+- validate user
+- create new user
+- find user
+- update user
 
-```bash
-$ npm install
-```
+**core**: global module created to register JWT root configs
 
-## Running the app
+## Main points
+### Social login flow
 
-```bash
-# development
-$ npm run start
+<img src="stuffs/images/social_login_flow.png?raw=true" width="512"/>
 
-# watch mode
-$ npm run start:dev
 
-# production mode
-$ npm run start:prod
-```
+Another case is login social user with their phone number I cant find the way to claim phone number yet
 
-## Test
+### Database design
+<img src="stuffs/images/erd.png?raw=true" width="512"/>
 
-```bash
-# unit tests
-$ npm run test
+`refresh_token` table:
+- `id`: is the jwtid when we sign with jwt service, I use it to find and revoke token as needed
+- `userId`: id of user, use to validate user when they call revoke token (user must own this token to revoke it)
 
-# e2e tests
-$ npm run test:e2e
+`users`
+- `id`: id in format of uuid
+- `username`: default is email, could be phone number if we use social login with profile contains only phone numver or profile id if user login with social login and 3rd system not return email or phone
+- `email`: could be empty but required when register new user
+= `phone`: `email` and `phone` could be empty when user login OAuth (Line for example)
+- `password`: hash with brypt, it is combination of brypt(plain password + salt)
+- `salt`: random characters, used when hashing password
 
-# test coverage
-$ npm run test:cov
-```
+### What I have learned:
+- Nest project structure
+- Module, Provider, Controller
+- Nest dependency injection
+- Authentication with Guards
+- Validate request with Pipe, transform with class-transformer
+- Dynamic module with forRoot, forFeature, register/registerAsync
+- Interact with databases (MySQL, Postgres) with TypeORM
 
-## Support
+### What I should do for better
+- logging
+- user should have status (active, inactive, force change password, force update info...)
+- verify email, verify phone
+- database migration
+- social login with phone number
+- write test cases
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
