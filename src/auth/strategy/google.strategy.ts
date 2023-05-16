@@ -33,17 +33,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       return null;
     }
 
-    const user = await this.userService.findOneBy({ username: email });
-    if (user) {
-      return user;
-    } else {
-      const password = this.userService.generateRandomPassword();
-      const newUser = await this.userService.create({
-        email: email,
-        name: name,
-        password: password,
-      });
-      return newUser;
-    }
+    const findOrCreateUser = { username: email, email, name };
+    return await this.userService.findOrCreate(findOrCreateUser);
   }
 }
