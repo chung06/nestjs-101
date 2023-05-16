@@ -60,7 +60,16 @@ export class UsersService {
     username: string,
     password: string,
   ): Promise<UserSerializer | null> {
-    const user = await this.userRepository.findOneBy({ username });
+    const user = await this.userRepository.findOne({
+      where: [
+        {
+          username: username,
+        },
+        {
+          phone: username,
+        },
+      ],
+    });
     if (user && (await user.validatePassword(password))) {
       return plainToClass(UserSerializer, user, {
         excludeExtraneousValues: true,
