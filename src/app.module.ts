@@ -23,7 +23,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         entities: [__dirname + '/**/**/*.entity.{js,ts}'],
-        synchronize: true,
+        synchronize: false,
       }),
       inject: [ConfigService],
     }),

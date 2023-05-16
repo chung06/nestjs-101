@@ -19,6 +19,7 @@ import { JwtRefreshAuthGuard } from './guard/jwt-refresh-auth.guard';
 import { Request } from 'express';
 import { plainToClass } from 'class-transformer';
 import { UserSerializer } from 'src/users/serializer/user.serializer';
+import { GoogleAuthGuard } from './guard/google.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -58,5 +59,18 @@ export class AuthController {
   @Put('/revoke/:id')
   revokeRefreshToken(@Req() req, @Param('id') id: string) {
     this.authService.revokeRefreshToken(id, req.user);
+  }
+
+  @UseGuards(GoogleAuthGuard)
+  @Get('/google/login')
+  googleLogin() {
+    return {};
+  }
+
+  @UseGuards(GoogleAuthGuard)
+  @Get('/google/callback')
+  googleCallback(@Req() req) {
+    const user = req.user;
+    return this.authService.login(user);
   }
 }

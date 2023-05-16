@@ -75,4 +75,18 @@ export class UsersService {
       return false;
     }
   }
+
+  generateRandomPassword(length?: number): string {
+    if (!length) {
+      length = 12;
+    }
+    const characters =
+      '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~!@-#$';
+    const charactersLength = characters.length;
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
 }
