@@ -60,6 +60,7 @@ Another case is login social user with their phone number I cant find the way to
 
 ### What I should do for better
 - logging
+- rate limit, ban login after fail attemps
 - user should have status (active, inactive, force change password, force update info...)
 - verify email, verify phone
 - database migration
